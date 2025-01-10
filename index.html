@@ -44,7 +44,7 @@
                             <input type="number" id="kills" class="form-control" placeholder="Kills" min="0" required>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <input type="number" id="placement" class="form-control" placeholder="Placement" min="1" max="16" required>
+                            <input type="number" id="placement" class="form-control" placeholder="Placement" min="1" max="25" required>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Add Entry</button>
@@ -59,7 +59,8 @@
                     <th>Team Name</th>
                     <th>Kills</th>
                     <th>Placement</th>
-                    <th>Points</th>
+                    <th>Placement Points</th>
+                    <th>Total Points</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -97,12 +98,15 @@
         let todos = JSON.parse(localStorage.getItem('todos')) || [];
 
         const calculatePoints = (kills, placement) => {
-            const placementPoints = [10, 6, 5, 4, 3, 2, 1, 1];
-            let placementScore = placement <= 8 ? placementPoints[placement - 1] : 0;
-            return kills * 1 + placementScore;
+            const placementPoints = [10, 6, 5, 4, 3, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            let placementScore = placement <= 25 ? placementPoints[placement - 1] : 0;
+            return kills + placementScore;
         };
 
         const renderTodos = () => {
+            // Sort todos by points in descending order before rendering
+            todos.sort((a, b) => b.points - a.points);
+
             todoList.innerHTML = '';
             todos.forEach((todo, index) => {
                 const row = document.createElement('tr');
@@ -111,6 +115,7 @@
                     <td>${todo.teamName}</td>
                     <td>${todo.kills}</td>
                     <td>${todo.placement}</td>
+                    <td>${todo.placementPoints}</td>
                     <td>${todo.points}</td>
                     <td>
                         <button class="btn btn-warning btn-sm" onclick="editTodo(${index})">Edit</button>
@@ -123,8 +128,15 @@
         };
 
         const addTodo = (teamName, kills, placement) => {
-            const points = calculatePoints(kills, placement);
-            todos.push({ teamName, kills, placement, points });
+            const placementPoints = [10, 6, 5, 4, 3, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            let points = kills + (placement <= 25 ? placementPoints[placement - 1] : 0);
+            todos.push({
+                teamName, 
+                kills, 
+                placement, 
+                placementPoints: placement <= 25 ? placementPoints[placement - 1] : 0, 
+                points
+            });
             renderTodos();
         };
 
@@ -164,7 +176,8 @@
             ctx.fillText('Team Name', 50, yOffset);
             ctx.fillText('Kills', 250, yOffset);
             ctx.fillText('Placement', 350, yOffset);
-            ctx.fillText('Points', 500, yOffset);
+            ctx.fillText('Placement Points', 450, yOffset);
+            ctx.fillText('Total Points', 550, yOffset);
 
             // Draw each row of data
             yOffset += 30;
@@ -172,7 +185,8 @@
                 ctx.fillText(todo.teamName, 50, yOffset);
                 ctx.fillText(todo.kills, 250, yOffset);
                 ctx.fillText(todo.placement, 350, yOffset);
-                ctx.fillText(todo.points, 500, yOffset);
+                ctx.fillText(todo.placementPoints, 450, yOffset);
+                ctx.fillText(todo.points, 550, yOffset);
                 yOffset += 30;
             });
 
